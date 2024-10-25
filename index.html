@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Server is running</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        p {
+            color: #666;
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .endpoint {
+            border-radius: 8px;
+            border: 2px solid black;
+            padding: 5px;
+        }
+
+        .json-example {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow-x: auto;
+            /* Enable horizontal scrolling */
+            white-space: nowrap;
+            /* Prevent wrapping */
+        }
+
+        .note {
+            color: #ff0000;
+            /* Red color for highlighting */
+            font-style: italic;
+            /* Italicize the note */
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Server is running ✅</h1>
+        <p>Server is live on Azure</p>
+        <h2>Endpoints</h2>
+        <table>
+            <tr>
+                <th>Endpoint</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td class="endpoint">POST /limited_generate</td>
+                <td>Endpoint for limited generation</td>
+            </tr>
+            <tr>
+                <td class="endpoint">GET /inputlist</td>
+                <td>Endpoint for getting list of all Requests</td>
+            </tr>
+            <tr>
+                <td class="endpoint">GET /status/{folder_name}</td>
+                <td>Endpoint for Status Checking</td>
+            </tr>
+            <tr>
+                <td class="endpoint">GET /data/{folder_name}</td>
+                <td>Endpoint for getting output in JSON</td>
+            </tr>
+            <tr>
+                <td class="endpoint">GET /DownloadFile/{folder_name}</td>
+                <td>Endpoint for Downloading files</td>
+            </tr>
+        </table>
+
+        <h2>Example JSON Input for Postman - Limited-Generation</h2>
+        <div class="json-example">
+            <pre>
+{
+    "Trends": "Social",
+    "filename": "Output",
+    "no_of_gen": 2,
+    "email": "sidhantraj0110@gmail.com",
+    "dept": "Law enforcement",
+    "additional_details": "",
+    "geography": "Australia"
+}          </pre>
+        </div>
+        <br>
+        <span class="note">Note: You will get the <b>folder name</b> as an output from the <b> limited_generation </b> endpoint.</span>
+        <h2>Example GET Request for Status Checking</h2>
+        <div class="json-example">
+            <pre>http://0.0.0.0:8000/status/ee4fefbc-9f62-46fe-b9bf-6ff050e1df4b</pre>
+        </div>
+        <h2>Example GET Request for Downloading File</h2>
+        <div class="json-example">
+            <pre>http://0.0.0.0:8000/DownloadFile/ee4fefbc-9f62-46fe-b9bf-6ff050e1df4b</pre>
+        </div>
+    </div>
+</body>
+
+</html>

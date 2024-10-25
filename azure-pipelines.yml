@@ -1,0 +1,42 @@
+stages:
+- stage: build
+  jobs:
+  - job: buildJob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: UsePythonVersion@0
+      displayName: "Use Python 3.12"
+      inputs:
+        versionSpec: '3.12'
+
+    - bash: |
+        echo ----- setup: installing dependencies --------
+        python --version
+        pip --version
+        python -m venv antenv
+        source antenv/bin/activate
+        
+        if [ -f "requirements.txt" ]; then
+          pip install -r requirements.txt
+        else
+          echo "requirements.txt not found. Exiting."
+          exit 1
+        fi
+      displayName: "Install Dependencies"
+
+
+    - task: ArchiveFiles@2
+      displayName: "Build Deployment Package"
+      inputs:
+        rootFolderOrFile: "$(Build.SourcesDirectory)"
+        includeRootFolder: false
+        archiveType: "zip"
+        archiveFile: "$(Build.ArtifactStagingDirectory)/CharterAPI$(Build.BuildId).zip"
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish Artifact"
+      inputs:
+        pathToPublish: "$(Build.ArtifactStagingDirectory)"
+        artifactName: drop
