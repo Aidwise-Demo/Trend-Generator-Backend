@@ -4,6 +4,7 @@ import re
 import time
 from openpyxl import load_workbook
 import os
+import requests
 
 def get_category(model, Trends, filename):
     response = model.generate_content("Provide the names of category which follow " + Trends + " trends which are related to deparatment of health Abu dhabi, Do not ignore Mater Prompt, Here is the master prompt: Follow the example i have shown always answer in comma separated, do not use numbering, like csv do not use any other format other than csv format to answer, for example you should answer like Category1, Category2 , Category3 ")
@@ -93,7 +94,7 @@ def final_output(model, df_subtrends2, filename):
             with pd.ExcelWriter(file_path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
                     # Write the combined data to the Excel file
                     combined_data.to_excel(writer, index=False, sheet_name='Sheet1')
-
+            # upload_dataframe_to_cloudinary(combined_data,file_name=f"{filename}.xlsx")
             print("Data Appended successfully")
             time.sleep(20)
 
@@ -122,11 +123,12 @@ def final_output(model, df_subtrends2, filename):
                 with pd.ExcelWriter(file_path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
                         # Write the combined data to the Excel file
                         combined_data.to_excel(writer, index=False, sheet_name='Sheet1')
-
+                
                 print("Data Appended successfully")
                 time.sleep(20)
 
             except Exception as e:
                 print(f"An error occurred: {str(e)}")
-                
-                
+    # upload_dataframe_to_cloudinary(combined_data,file_name=f"{filename}.xlsx")
+    # print("file uploaded to cloudinary")
+         

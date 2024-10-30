@@ -6,7 +6,10 @@ import tempfile
 import uuid
 from email.message import EmailMessage
 from pathlib import Path
-
+from filetocloudinary import upload_dataframe_to_cloudinary
+# pip install cloudinary
+import cloudinary
+import cloudinary.uploader
 import google.generativeai as genai
 import motor.motor_asyncio
 import openpyxl
@@ -17,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from pydantic import BaseModel
 from starlette.background import BackgroundTask
-
+from xlsxwriter import Workbook
 import limited_generation as Limit_gen
 load_dotenv()
 
@@ -30,7 +33,6 @@ collection2 = db.Ouput
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY_GRAVITY")
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS_GRAVITY")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD_GRAVITY")
-
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
@@ -113,7 +115,7 @@ def smart_capitalize(sentence):
     # Join the words back into a single string
     return " ".join(capitalized_sentence)
 
-def send_email(email, foldername):
+def send_email(email, download_link):
     # Create email message
     Usermsg = EmailMessage()
 
@@ -121,7 +123,7 @@ def send_email(email, foldername):
     with open("email.html", "r", encoding="utf-8") as file:
         html_content = file.read()
 
-    html_content = html_content.replace("{foldername}", foldername)
+    html_content = html_content.replace("{download_link}", download_link)
 
     Usermsg.set_content(html_content, subtype='html') 
     Usermsg['Subject'] = "Your file is ready to download 🎉"
@@ -160,6 +162,10 @@ def background_function(Trends, no_of_gen, filename, email, folder_name, dept , 
     df = pd.read_excel(filename + '.xlsx', names=column_names)
     df = df.dropna()
     df = df.drop_duplicates()
+    clodinary_filename=filename.split("\\")
+    upload_dataframe_to_cloudinary(df,file_name=f"{clodinary_filename[-1]}.xlsx")
+    download_link=upload_dataframe_to_cloudinary(df,file_name=f"{clodinary_filename[-1]}.xlsx")
+    print("saved to cloudinary")
     
     if os.path.exists(filename+ '.xlsx'):
         os.remove(filename+ '.xlsx')
@@ -185,7 +191,7 @@ def background_function(Trends, no_of_gen, filename, email, folder_name, dept , 
     else:
         print(f"Folder '{deletepath}' not found")
 
-    send_email(email=email, foldername=folder_name)
+    send_email(email=email, download_link=download_link)
     print(f"Email Sent to : {email}")
     
     update_status(folder_name)
