@@ -3,19 +3,16 @@ import io
 import cloudinary
 import cloudinary.uploader
 
-# Configure your Cloudinary credentials
-cloudinary.config(
-    cloud_name="dge8sniaa",
-    api_key="428333455231115",
-    api_secret="huSTYFbBLUjU7EgxezYxohSjCRM"
-)
+import os
+from dotenv import load_dotenv  
+load_dotenv()
 
 def upload_dataframe_to_cloudinary(df, folder_name="Trend generator", file_name="dataframe.xlsx"):
     # Save the DataFrame as an Excel file in memory
     cloudinary.config(
-    cloud_name="dge8sniaa",
-    api_key="428333455231115",
-    api_secret="huSTYFbBLUjU7EgxezYxohSjCRM"
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME_AIDWISE_DEMO"),
+    api_key=os.getenv("CLOUDINARY_API_KEY_AIDWISE_DEMO"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET_AIDWISE_DEMO")
 )
     excel_buffer = io.BytesIO()
     with pd.ExcelWriter(excel_buffer, engine="xlsxwriter") as writer:
