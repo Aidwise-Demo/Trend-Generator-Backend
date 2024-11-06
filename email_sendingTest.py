@@ -5,10 +5,10 @@ import os
 load_dotenv()
 
 # Gmail SMTP configuration
-SMTP_SERVER = 'smtp.gmail.com'
+SMTP_SERVER = 'smtp.office365.com'
 SMTP_PORT = 587
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS_AIDWISE_DEMO")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD_AIDWISE_DEMO")
 
 
 def send_email(email):
