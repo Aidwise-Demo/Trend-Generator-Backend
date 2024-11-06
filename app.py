@@ -24,15 +24,15 @@ from xlsxwriter import Workbook
 import limited_generation as Limit_gen
 load_dotenv()
 
-MONGO_URI = os.getenv("MONGO_URI_GRAVITY")
+MONGO_URI = os.getenv("MONGO_URI_AIDWISE_DEMO")
 client1 = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
 db = client1.HorizonScanner
 collection1 = db.Input
 collection2 = db.Ouput
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY_GRAVITY")
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS_GRAVITY")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD_GRAVITY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY_AIDWISE_DEMO")
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS_AIDWISE_DEMO")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD_AIDWISE_DEMO")
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
@@ -68,7 +68,7 @@ model = genai.GenerativeModel(model_name="gemini-1.5-flash-latest", safety_setti
 Trend_list = ['Social','Technological','Economic','Environmental','Political','Legal','Ethical']
 # sample
 # Gmail SMTP configuration
-SMTP_SERVER = 'smtp.gmail.com'
+SMTP_SERVER = 'smtp.office365.com'
 SMTP_PORT = 587
 
 OUTPUT_FOLDER = "Output"
