@@ -28,11 +28,26 @@ jobs:
           eaV/9ElHLe4PUj5IkuB2AAAAD2RlbW9AYWlkd2lzZS5haQECAwQFBg==
           -----END OPENSSH PRIVATE KEY-----
 
-
     - name: Deploy Code to VPS
       run: |
         ssh -o StrictHostKeyChecking=no root@193.203.160.132 "mkdir -p /home/deployment/trend-generator"
         rsync -avz --exclude='.git' ./ root@193.203.160.132:/home/deployment/trend-generator/
+
+    - name: Set up Python Virtual Environment on VPS
+      run: |
+        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
+          cd /home/deployment/trend-generator
+          # Install python3-venv if it's not already installed
+          sudo apt-get update
+          sudo apt-get install -y python3-venv python3-pip
+          # Create a virtual environment
+          python3 -m venv venv
+          # Activate the virtual environment
+          source venv/bin/activate
+          # Install necessary Python packages inside the virtual environment (add more as needed)
+          pip install --upgrade pip
+          pip install -r requirements.txt  # Assuming you have a requirements.txt file
+        EOF
 
     - name: Build and Run Docker Container on VPS
       run: |
