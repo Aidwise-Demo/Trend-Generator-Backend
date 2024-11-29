@@ -8,4 +8,4 @@ services:
       - .env
     volumes:
       - /home/deployment/trend-generator:/app  # Mount this directory
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
