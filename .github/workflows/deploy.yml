@@ -13,46 +13,48 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
+    - name: Set up Python environment
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'  # Specify the Python version you need
+
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-      env:
-        SSH_PRIVATE_KEY: |
-          -----BEGIN OPENSSH PRIVATE KEY-----
-          b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-          QyNTUxOQAAACBYAzI8nAn7yBAsCT0GRwSHZ3mlf/RJRy3uD1I+SJLgdgAAAJgpgHrfKYB6
-          3wAAAAtzc2gtZWQyNTUxOQAAACBYAzI8nAn7yBAsCT0GRwSHZ3mlf/RJRy3uD1I+SJLgdg
-          AAAECGTWwHZiXKe8jCCBlrL+r9NK/3SXxzSJ8pM8+IY1/ZwFgDMjycCfvIECwJPQZHBIdn
-          eaV/9ElHLe4PUj5IkuB2AAAAD2RlbW9AYWlkd2lzZS5haQECAwQFBg==
-          -----END OPENSSH PRIVATE KEY-----
 
     - name: Deploy Code to VPS
       run: |
-        ssh -o StrictHostKeyChecking=no root@193.203.160.132 "mkdir -p /home/deployment/trend-generator"
-        rsync -avz --exclude='.git' ./ root@193.203.160.132:/home/deployment/trend-generator/
+        ssh -o StrictHostKeyChecking=no deployer@193.203.160.132 << 'EOF'
+          # Check if the directory exists, remove it if necessary, and recreate
+          if [ -d "/home/deployment/trend-generator" ]; then
+            echo "Removing existing trend-generator directory..."
+            rm -rf /home/deployment/trend-generator
+          fi
+          echo "Creating trend-generator directory..."
+          mkdir -p /home/deployment/trend-generator
+        EOF
+        rsync -avz --exclude='.git' ./ deployer@193.203.160.132:/home/deployment/trend-generator/
 
     - name: Set up Python Virtual Environment on VPS
       run: |
-        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
+        ssh -o StrictHostKeyChecking=no deployer@193.203.160.132 << 'EOF'
           cd /home/deployment/trend-generator
-          # Install python3-venv if it's not already installed
           sudo apt-get update
           sudo apt-get install -y python3-venv python3-pip
-          # Create a virtual environment
           python3 -m venv venv
-          # Activate the virtual environment
           source venv/bin/activate
-          # Install necessary Python packages inside the virtual environment (add more as needed)
           pip install --upgrade pip
-          pip install -r requirements.txt  # Assuming you have a requirements.txt file
+          pip install -r requirements.txt
         EOF
 
     - name: Build and Run Docker Container on VPS
       run: |
-        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
+        ssh -o StrictHostKeyChecking=no deployer@193.203.160.132 << 'EOF'
           cd /home/deployment/trend-generator
+          
+          # Set environment variables securely using GitHub Secrets
           echo "GOOGLE_API_KEY_AIDWISE_DEMO=${{ secrets.GOOGLE_API_KEY_AIDWISE_DEMO }}" >> .env
           echo "EMAIL_ADDRESS_AIDWISE_DEMO=${{ secrets.EMAIL_ADDRESS_AIDWISE_DEMO }}" >> .env
           echo "EMAIL_PASSWORD_AIDWISE_DEMO=${{ secrets.EMAIL_PASSWORD_AIDWISE_DEMO }}" >> .env
@@ -60,6 +62,21 @@ jobs:
           echo "CLOUDINARY_CLOUD_NAME_AIDWISE_DEMO=${{ secrets.CLOUDINARY_CLOUD_NAME_AIDWISE_DEMO }}" >> .env
           echo "CLOUDINARY_API_KEY_AIDWISE_DEMO=${{ secrets.CLOUDINARY_API_KEY_AIDWISE_DEMO }}" >> .env
           echo "CLOUDINARY_API_SECRET_AIDWISE_DEMO=${{ secrets.CLOUDINARY_API_SECRET_AIDWISE_DEMO }}" >> .env
-          docker-compose down || true  # Stop any running containers
-          docker-compose --env-file .env up --build -d  # Build and run container
+
+          # Install Docker Compose if not installed
+          if ! command -v docker-compose &> /dev/null; then
+            sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+
+          # Stop running containers and clean up unused images
+          docker-compose down || { echo 'Docker Compose down failed'; exit 1; }
+          docker image prune -f  # Clean up unused images
+          
+          # Build and start Docker container
+          docker-compose --env-file .env up --build -d || { echo 'Docker Compose up failed'; exit 1; }
+
+          # Get the IP and Port of the running container
+          echo "The container is running on IP: 193.203.160.132"
+          echo "The Docker container can be accessed on port 8000."
         EOF
