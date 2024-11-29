@@ -83,7 +83,15 @@ jobs:
           
           # Build and start Docker container
           docker-compose --env-file .env up --build -d || { echo 'Docker Compose up failed'; exit 1; }
-
+          
+          # Wait and check container status
+          sleep 4
+          if ! docker ps | grep -q "trend-generator"; then
+            echo "Container failed to start or exited unexpectedly."
+            docker-compose logs
+            exit 1
+          fi
+          
           # Get the IP and Port of the running container
           echo "The container is running on IP: 193.203.160.132"
           echo "The Docker container can be accessed on port 8000."
