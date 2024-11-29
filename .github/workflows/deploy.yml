@@ -26,7 +26,7 @@ jobs:
 
     - name: Deploy Code to VPS
       run: |
-        ssh -o StrictHostKeyChecking=no deployer@193.203.160.132 << 'EOF'
+        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
           # Check if the directory exists, remove it if necessary, and recreate
           if [ -d "/home/deployment/trend-generator" ]; then
             echo "Removing existing trend-generator directory..."
@@ -35,11 +35,11 @@ jobs:
           echo "Creating trend-generator directory..."
           mkdir -p /home/deployment/trend-generator
         EOF
-        rsync -avz --exclude='.git' ./ deployer@193.203.160.132:/home/deployment/trend-generator/
+        rsync -avz --exclude='.git' ./ root@193.203.160.132:/home/deployment/trend-generator/
 
     - name: Set up Python Virtual Environment on VPS
       run: |
-        ssh -o StrictHostKeyChecking=no deployer@193.203.160.132 << 'EOF'
+        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
           cd /home/deployment/trend-generator
           sudo apt-get update
           sudo apt-get install -y python3-venv python3-pip
@@ -51,7 +51,7 @@ jobs:
 
     - name: Build and Run Docker Container on VPS
       run: |
-        ssh -o StrictHostKeyChecking=no deployer@193.203.160.132 << 'EOF'
+        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
           cd /home/deployment/trend-generator
           
           # Set environment variables securely using GitHub Secrets
