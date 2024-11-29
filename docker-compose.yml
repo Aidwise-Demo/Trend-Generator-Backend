@@ -1,0 +1,11 @@
+services:
+  fastapi:
+    build:
+      context: /home/deployment/trend-generator  # Use this directory as the context
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - /home/deployment/trend-generator:/app  # Mount this directory
+    command: uvicorn main:app --host 0.0.0.0 --port 8000

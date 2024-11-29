@@ -1,4 +1,7 @@
 __pycache__
 .venv
 .idea
-backup.txt
+
+.env
+azure-pipelines.yml
+output.xlsx

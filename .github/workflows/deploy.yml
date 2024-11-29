@@ -1,0 +1,39 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - main  # Deploy only when code is pushed to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_AIDWISE_DEMO }}
+
+    - name: Deploy Code to VPS
+      run: |
+        ssh -o StrictHostKeyChecking=no root@193.203.160.132 "mkdir -p /home/deployment/trend-generator"
+        rsync -avz --exclude='.git' ./ root@193.203.160.132:/home/deployment/trend-generator/
+
+    - name: Build and Run Docker Container on VPS
+      run: |
+        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
+          cd /home/deployment/trend-generator
+          echo "GOOGLE_API_KEY_AIDWISE_DEMO=${{ secrets.GOOGLE_API_KEY_AIDWISE_DEMO }}" >> .env
+          echo "EMAIL_ADDRESS_AIDWISE_DEMO=${{ secrets.EMAIL_ADDRESS_AIDWISE_DEMO }}" >> .env
+          echo "EMAIL_PASSWORD_AIDWISE_DEMO=${{ secrets.EMAIL_PASSWORD_AIDWISE_DEMO }}" >> .env
+          echo "MONGO_URI_AIDWISE_DEMO=${{ secrets.MONGO_URI_AIDWISE_DEMO }}" >> .env
+          echo "CLOUDINARY_CLOUD_NAME_AIDWISE_DEMO=${{ secrets.CLOUDINARY_CLOUD_NAME_AIDWISE_DEMO }}" >> .env
+          echo "CLOUDINARY_API_KEY_AIDWISE_DEMO=${{ secrets.CLOUDINARY_API_KEY_AIDWISE_DEMO }}" >> .env
+          echo "CLOUDINARY_API_SECRET_AIDWISE_DEMO=${{ secrets.CLOUDINARY_API_SECRET_AIDWISE_DEMO }}" >> .env
+          docker-compose down || true  # Stop any running containers
+          docker-compose --env-file .env up --build -d  # Build and run container
+        EOF
