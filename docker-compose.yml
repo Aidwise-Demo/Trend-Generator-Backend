@@ -1,7 +1,7 @@
 services:
   fastapi:
     build:
-      context: /home/deployment/trend-generator  # Use this directory as the context
+      context: ${VPS_DIRECTORY_AIDWISE_DEMO}  # Use this directory as the context
     ports:
       - "${VPS_EXPOSED_PORT_AIDWISE_DEMO}:8000"
     env_file:

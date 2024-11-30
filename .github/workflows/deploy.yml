@@ -68,7 +68,7 @@ jobs:
           echo "CLOUDINARY_API_KEY_AIDWISE_DEMO=${{ secrets.CLOUDINARY_API_KEY_AIDWISE_DEMO }}" >> .env
           echo "CLOUDINARY_API_SECRET_AIDWISE_DEMO=${{ secrets.CLOUDINARY_API_SECRET_AIDWISE_DEMO }}" >> .env
           echo "VPS_EXPOSED_PORT_AIDWISE_DEMO=${{ secrets.VPS_EXPOSED_PORT_AIDWISE_DEMO }}" >> .env
-
+          echo "VPS_DIRECTORY_AIDWISE_DEMO=${{ env.VPS_DIRECTORY_AIDWISE_DEMO }}" >> .env
 
           # Install Docker Compose if not installed
           if ! command -v docker-compose &> /dev/null; then
