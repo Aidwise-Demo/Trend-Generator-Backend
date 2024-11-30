@@ -31,7 +31,7 @@ jobs:
 
     - name: Deploy Code to VPS
       run: |
-        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
+        ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }} << 'EOF'
           # Check if the directory exists, remove it if necessary, and recreate
           if [ -d "/home/deployment/trend-generator" ]; then
             echo "Removing existing trend-generator directory..."
@@ -40,11 +40,11 @@ jobs:
           echo "Creating trend-generator directory..."
           mkdir -p /home/deployment/trend-generator
         EOF
-        rsync -avz --exclude='.git' ./ root@193.203.160.132:/home/deployment/trend-generator/
+        rsync -avz --exclude='.git' ./ ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }}:/home/deployment/trend-generator/
 
     - name: Set up Python Virtual Environment on VPS
       run: |
-        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
+        ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }} << 'EOF'
           cd /home/deployment/trend-generator
           sudo apt-get update
           sudo apt-get install -y python3-venv python3-pip
@@ -55,7 +55,7 @@ jobs:
 
     - name: Build and Run Docker Container on VPS
       run: |
-        ssh -o StrictHostKeyChecking=no root@193.203.160.132 << 'EOF'
+        ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }} << 'EOF'
           cd /home/deployment/trend-generator
           
           # Set environment variables securely using GitHub Secrets
@@ -89,6 +89,6 @@ jobs:
           fi
           
           # Get the IP and Port of the running container
-          echo "The container is running on IP: 193.203.160.132"
+          echo "The container is running!"
           echo "The Docker container can be accessed on port 8000."
         EOF
