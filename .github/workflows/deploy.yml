@@ -26,11 +26,7 @@ jobs:
       env:
         SSH_PRIVATE_KEY: |
           -----BEGIN OPENSSH PRIVATE KEY-----
-          b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-          QyNTUxOQAAACBYAzI8nAn7yBAsCT0GRwSHZ3mlf/RJRy3uD1I+SJLgdgAAAJgpgHrfKYB6
-          3wAAAAtzc2gtZWQyNTUxOQAAACBYAzI8nAn7yBAsCT0GRwSHZ3mlf/RJRy3uD1I+SJLgdg
-          AAAECGTWwHZiXKe8jCCBlrL+r9NK/3SXxzSJ8pM8+IY1/ZwFgDMjycCfvIECwJPQZHBIdn
-          eaV/9ElHLe4PUj5IkuB2AAAAD2RlbW9AYWlkd2lzZS5haQECAwQFBg==
+          ${{ secrets.GOOGLE_API_KEY_AIDWISE_DEMO }}
           -----END OPENSSH PRIVATE KEY-----
 
     - name: Deploy Code to VPS
