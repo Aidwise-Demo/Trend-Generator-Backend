@@ -8,7 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    env:
+      VPS_DIRECTORY_AIDWISE_DEMO: ${{ secrets.VPS_DIRECTORY_AIDWISE_DEMO }}
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
@@ -28,25 +29,24 @@ jobs:
           -----BEGIN OPENSSH PRIVATE KEY-----
           ${{ secrets.SSH_PRIVATE_KEY_AIDWISE_DEMO }}
           -----END OPENSSH PRIVATE KEY-----
-        VPS_DIRECTORY_AIDWISE_DEMO: ${{ secrets.VPS_DIRECTORY_AIDWISE_DEMO }}
-
+    
     - name: Deploy Code to VPS
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }} << 'EOF'
           # Check if the directory exists, remove it if necessary, and recreate
-          if [ -d "$VPS_DIRECTORY_AIDWISE_DEMO" ]; then
+          if [ -d "${{ env.VPS_DIRECTORY_AIDWISE_DEMO }}" ]; then
             echo "Removing existing trend-generator directory..."
-            rm -rf $VPS_DIRECTORY_AIDWISE_DEMO
+            rm -rf ${{ env.VPS_DIRECTORY_AIDWISE_DEMO }}
           fi
           echo "Creating trend-generator directory..."
-          mkdir -p $VPS_DIRECTORY_AIDWISE_DEMO
+          mkdir -p ${{ env.VPS_DIRECTORY_AIDWISE_DEMO }}
         EOF
-        rsync -avz --exclude='.git' ./ ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }}:$VPS_DIRECTORY_AIDWISE_DEMO/
+        rsync -avz --exclude='.git' ./ ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }}:${{ env.VPS_DIRECTORY_AIDWISE_DEMO }}/
 
     - name: Set up Python Virtual Environment on VPS
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }} << 'EOF'
-          cd $VPS_DIRECTORY_AIDWISE_DEMO
+          cd ${{ env.VPS_DIRECTORY_AIDWISE_DEMO }}
           sudo apt-get update
           sudo apt-get install -y python3-venv python3-pip
           python3 -m venv venv
@@ -57,7 +57,7 @@ jobs:
     - name: Build and Run Docker Container on VPS
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME_AIDWISE_DEMO }}@${{ secrets.VPS_IPADDRESS_AIDWISE_DEMO }} << 'EOF'
-          cd $VPS_DIRECTORY_AIDWISE_DEMO
+          cd ${{ env.VPS_DIRECTORY_AIDWISE_DEMO }}
           
           # Set environment variables securely using GitHub Secrets
           echo "GOOGLE_API_KEY_AIDWISE_DEMO=${{ secrets.GOOGLE_API_KEY_AIDWISE_DEMO }}" >> .env
